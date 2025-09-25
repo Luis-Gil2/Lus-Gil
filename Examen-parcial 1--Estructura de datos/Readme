@@ -1,4 +1,5 @@
-# Examen-Parcial-1---Estructura-de-Datos
+#Examen-Parcial-1---Estructura-de-Datos
+
 EJERCICIO 1
 Este ejercicio cuenta con dos arreglos, el primero almacena los nombres y el segundo la longitud  de los mismos, después en un ciclo While el programa te pide ingresar la cantidad de nombres a escribir, en ese mismo ciclo evalúa con las funciones Try y Except que el valor ingresado sea un entero, después de salir del ciclo While inicia un ciclo for que se repite tantas veces como nombres vas a digitar, dicho ciclo for te pide los ya mencionados nombres y a su vez calcula su longitud y las guarda en el arreglo longitud y al final, con ayuda de un ciclo for se imprimen los nombres y sus longitudes.
 
