@@ -2,12 +2,15 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog
 from bisect import bisect_left
 
+# --------------------------------------------------------------------
+# ------------------------- MODELO DE DATOS --------------------------
+# --------------------------------------------------------------------
 class PostresManager:
     def __init__(self):
         self.postres = []
 
     def _key(self, name):
-        return name.lower()
+        return name.lower().strip()
 
     def _find_index(self, name):
         keys = [self._key(p['name']) for p in self.postres]
@@ -26,8 +29,12 @@ class PostresManager:
         i = self._find_index(name)
         if i < len(self.postres) and self._key(self.postres[i]['name']) == self._key(name):
             ingr = self.postres[i]['ingredients']
-            if ingredient not in ingr:
-                ingr.append(ingredient)
+            # 🔹 Normalizamos ingrediente
+            norm_ing = ingredient.strip().title()
+            # 🔹 Comparamos sin distinguir mayúsculas
+            if all(self._key(x) != self._key(norm_ing) for x in ingr):
+                ingr.append(norm_ing)
+                ingr.sort(key=str.lower)
                 return True
             return False
         raise KeyError(f"No existe el postre '{name}'.")
@@ -36,19 +43,27 @@ class PostresManager:
         i = self._find_index(name)
         if i < len(self.postres) and self._key(self.postres[i]['name']) == self._key(name):
             ingr = self.postres[i]['ingredients']
-            if ingredient in ingr:
-                ingr.remove(ingredient)
-                return True
+            for ing in ingr:
+                if self._key(ing) == self._key(ingredient):
+                    ingr.remove(ing)
+                    return True
             raise ValueError(f"'{ingredient}' no está en '{name}'.")
         raise KeyError(f"No existe el postre '{name}'.")
 
     def add_postre(self, name, ingredients):
         if not name:
             raise ValueError("Nombre de postre vacío.")
+        name = name.strip().title()  # 🔹 Normaliza visualmente el nombre
         i = self._find_index(name)
         if i < len(self.postres) and self._key(self.postres[i]['name']) == self._key(name):
             raise KeyError(f"'{name}' ya existe.")
-        uniq_ing = list(dict.fromkeys(ingredients))
+        # 🔹 Normaliza ingredientes y elimina duplicados sin distinguir mayúsculas
+        uniq_ing = []
+        for ing in ingredients:
+            norm_ing = ing.strip().title()
+            if norm_ing and all(self._key(x) != self._key(norm_ing) for x in uniq_ing):
+                uniq_ing.append(norm_ing)
+        uniq_ing.sort(key=str.lower)
         self.postres.insert(i, {'name': name, 'ingredients': uniq_ing})
 
     def delete_postre(self, name):
@@ -66,17 +81,25 @@ class PostresManager:
         for item in self.postres:
             k = self._key(item['name'])
             if prev_key is None or k != prev_key:
-                nueva.append({'name': item['name'], 'ingredients': list(dict.fromkeys(item['ingredients']))})
+                uniq_ing = []
+                for ing in item['ingredients']:
+                    if all(self._key(x) != self._key(ing) for x in uniq_ing):
+                        uniq_ing.append(ing)
+                nueva.append({'name': item['name'], 'ingredients': uniq_ing})
                 prev_key = k
             else:
                 base = nueva[-1]['ingredients']
                 for ing in item['ingredients']:
-                    if ing not in base:
+                    if all(self._key(x) != self._key(ing) for x in base):
                         base.append(ing)
         removed = len(self.postres) - len(nueva)
         self.postres = nueva
         return removed
-    
+
+
+# --------------------------------------------------------------------
+# ----------------------------- INTERFAZ -----------------------------
+# --------------------------------------------------------------------
 class PostresApp:
     def __init__(self, root):
         self.root = root
@@ -93,6 +116,7 @@ class PostresApp:
         self.manager = PostresManager()
         self._crear_layout()
 
+        # Datos iniciales
         self.manager.add_postre("Brownie", ["Chocolate", "Harina", "Azúcar", "Huevo"])
         self.manager.add_postre("Flan", ["Leche", "Huevo", "Azúcar"])
         self.manager.add_postre("Gelatina", ["Grenetina", "Agua", "Colorante"])
@@ -156,7 +180,7 @@ class PostresApp:
         ingredientes = [i.strip() for i in ingredientes_str.split(",")] if ingredientes_str else []
         try:
             self.manager.add_postre(nombre, ingredientes)
-            messagebox.showinfo("Éxito", f"'{nombre}' agregado correctamente.")
+            messagebox.showinfo("Éxito", f"'{nombre.title()}' agregado correctamente.")
             self._actualizar_lista_postres()
         except KeyError as e:
             messagebox.showerror("Error", str(e))
@@ -215,6 +239,7 @@ class PostresApp:
             messagebox.showinfo("Limpieza", f"Se eliminaron {eliminados} duplicados.")
         else:
             messagebox.showinfo("Limpieza", "No había duplicados.")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
