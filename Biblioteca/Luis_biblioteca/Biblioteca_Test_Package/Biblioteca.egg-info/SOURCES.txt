@@ -1,0 +1,7 @@
+setup.py
+Biblioteca/LINKEDLIST.py
+Biblioteca/__init__.py
+Biblioteca.egg-info/PKG-INFO
+Biblioteca.egg-info/SOURCES.txt
+Biblioteca.egg-info/dependency_links.txt
+Biblioteca.egg-info/top_level.txt
