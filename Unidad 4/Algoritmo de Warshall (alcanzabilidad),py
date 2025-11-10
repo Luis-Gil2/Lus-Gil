@@ -1,0 +1,19 @@
+def warshall(alcanzable):
+    n = len(alcanzable)
+    for k in range(n):
+        for i in range(n):
+            for j in range(n):
+                alcanzable[i][j] = alcanzable[i][j] or (alcanzable[i][k] and alcanzable[k][j])
+    return alcanzable
+
+
+# Ejemplo
+alcanzable = [
+    [1, 1, 0],
+    [0, 1, 1],
+    [0, 0, 1]
+]
+
+resultado = warshall(alcanzable)
+for fila in resultado:
+    print(fila)

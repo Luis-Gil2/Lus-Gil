@@ -1,0 +1,22 @@
+def floyd_warshall(grafo):
+    dist = dict(grafo)
+    nodos = list(grafo.keys())
+
+    for k in nodos:
+        for i in nodos:
+            for j in nodos:
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    return dist
+
+
+# Ejemplo
+grafo = {
+    'A': {'A': 0, 'B': 3, 'C': 8, 'D': float('inf')},
+    'B': {'A': float('inf'), 'B': 0, 'C': float('inf'), 'D': 1},
+    'C': {'A': float('inf'), 'B': 4, 'C': 0, 'D': float('inf')},
+    'D': {'A': 2, 'B': float('inf'), 'C': -5, 'D': 0}
+}
+
+resultado = floyd_warshall(grafo)
+for i in resultado:
+    print(i, resultado[i])
